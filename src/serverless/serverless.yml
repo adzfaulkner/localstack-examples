@@ -1,0 +1,42 @@
+service: serverless-example
+
+frameworkVersion: ">=2.24.0"
+
+provider:
+  name: aws
+  runtime: go1.x
+  region: eu-west-2
+  stage: local
+
+package:
+  individually: true
+  exclude:
+    - ./**
+
+plugins:
+  - serverless-localstack
+
+custom:
+  localstack:
+    stages:
+      - local
+    host: http://localhost
+    edgePort: 4566
+    autostart: true
+  stages:
+    local:
+
+functions:
+  get:
+    handler: build/main
+    package:
+      include:
+        - ./build/main
+    events:
+      - http:
+          path: get/{name}
+          method: get
+          request:
+            parameter:
+              paths:
+                name: true
